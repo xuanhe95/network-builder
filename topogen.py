@@ -1,6 +1,9 @@
 import argparse
 from datetime import datetime
 from network_builder import FatTreeBuilder
+import node_linker
+import output_strategy
+import flow_strategy
 
 
 SPINE_SWITCHES = 2
@@ -24,11 +27,16 @@ def generate_switches(f, total_switches):
     return f"Switches: {output}"
 
 
-def generate_fat_file():
-    FatTreeBuilder(
-        6, bandwidth="100Gbps", delay="0.001ms", error_rate="0"
-    ).link_construct()
-    FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
+def generate_fat_tree():
+    output = output_strategy.FileOutputStrategy("topology.txt")
+    flow_output = output_strategy.FileOutputStrategy("flow.txt")
+    flow_strategy_ = flow_strategy.HalfFlowStrategy(flow_output)
+    linker = node_linker.HalfNodeLinker(output, flow_strategy_)
+
+    FatTreeBuilder(linker, 4).link_construct(
+        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+    )
+    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
 
 
 if __name__ == "__main__":
@@ -121,4 +129,4 @@ if __name__ == "__main__":
     #     args.switch_to_host_error_rate,
     # )
 
-    generate_fat_file()
+    generate_fat_tree()

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from output_strategy import FileOutputStrategy
-from link_generator import log_write, DefaultLinkStrategy
+from node_linker import *
 
 from level_connector import *
 
@@ -26,12 +26,12 @@ class NetworkBuilder(ABC):
 # class SpineLeafConnector(Connector):
 #     def __init__(
 #         self,
-#         link_generator,
+#         node_linker,
 #         num_spine_switches,
 #         num_leaf_switches,
 #         host_per_leaf,
 #     ):
-#         self.link_generator = link_generator
+#         self.node_linker = node_linker
 #         self.num_spine_switches = num_spine_switches
 #         self.num_leaf_switches = num_leaf_switches
 #         self.host_per_leaf = host_per_leaf
@@ -43,7 +43,7 @@ class NetworkBuilder(ABC):
 #     @log_write
 #     def build_links(self, **kwargs):
 #         level0 = FullMeshConnectionLevel(
-#             self.link_generator,
+#             self.node_linker,
 #             self.num_spine_switches,
 #             self.num_leaf_switches,
 #             0,
@@ -52,7 +52,7 @@ class NetworkBuilder(ABC):
 #         id = level0.connect(**kwargs)
 
 #         level1 = GroupConnectionLevel(
-#             self.link_generator,
+#             self.node_linker,
 #             self.num_leaf_switches,
 #             self.num_leaf_switches * self.host_per_leaf,
 #             id,
@@ -64,18 +64,19 @@ class NetworkBuilder(ABC):
 class FatTreeBuilder(NetworkBuilder):
     def __init__(
         self,
+        node_linkder,
         k=4,
         host_per_edge=3,
-        output_strategy=FileOutputStrategy(),
         **kwargs,
     ):
-        self.output = output_strategy
-        self.link_generator = DefaultLinkStrategy(output_strategy)
+        self.output = node_linkder.get_output()
+        self.node_linker = node_linkder
         self.num_core_switches = k**2 // 4
         self.num_agg_switches = k**2 // 2
         self.num_edge_switches = k**2 // 2
         self.host_per_edge = host_per_edge
         self.k = k
+        self.kwargs = kwargs
 
     @log_write
     def construct(self, **kwargs):
@@ -89,7 +90,7 @@ class FatTreeBuilder(NetworkBuilder):
         self.build_nodes()
         self.build_switches()
         connector = FullOverStepConnector(
-            self.link_generator,
+            self.node_linker,
             self.num_core_switches,
             self.num_agg_switches,
             0,
@@ -97,8 +98,12 @@ class FatTreeBuilder(NetworkBuilder):
         )
 
         connector.connectTo(
-            GroupOverGroupConnector, self.num_edge_switches, self.k
-        ).connectTo(OneOverGroupConnector, self.num_edge_switches * self.host_per_edge)
+            GroupOverGroupConnector, self.num_edge_switches, self.k, **kwargs
+        ).connectTo(
+            OneOverGroupConnector, self.num_edge_switches * self.host_per_edge, **kwargs
+        )
+
+        return f"Fat Tree topology generated.\n"
 
     @log_write
     def build_nodes(self, **kwargs):
@@ -129,7 +134,7 @@ class FatTreeBuilder(NetworkBuilder):
     @log_write
     def build_links(self, **kwargs):
         level0 = FullOverStepConnector(
-            self.link_generator,
+            self.node_linker,
             self.num_core_switches,
             self.num_agg_switches,
             0,
@@ -139,7 +144,7 @@ class FatTreeBuilder(NetworkBuilder):
         id = level0.connect(**kwargs)
 
         level1 = GroupOverGroupConnector(
-            self.link_generator,
+            self.node_linker,
             self.num_agg_switches,
             self.num_edge_switches,
             id,
@@ -149,7 +154,7 @@ class FatTreeBuilder(NetworkBuilder):
         id = level1.connect(**kwargs)
 
         level2 = OneOverGroupConnector(
-            self.link_generator,
+            self.node_linker,
             self.num_edge_switches,
             self.num_edge_switches * self.host_per_edge,
             id,

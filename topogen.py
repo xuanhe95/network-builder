@@ -25,6 +25,9 @@ def generate_switches(f, total_switches):
 
 
 def generate_fat_file():
+    FatTreeBuilder(
+        6, bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+    ).link_construct()
     FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
 
 

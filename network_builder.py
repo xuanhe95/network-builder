@@ -85,6 +85,22 @@ class FatTreeBuilder(NetworkBuilder):
         return f"Fat Tree topology generated.\n"
 
     @log_write
+    def link_construct(self, **kwargs):
+        self.build_nodes()
+        self.build_switches()
+        connector = FullOverStepConnector(
+            self.link_generator,
+            self.num_core_switches,
+            self.num_agg_switches,
+            0,
+            self.k,
+        )
+
+        connector.connectTo(
+            GroupOverGroupConnector, self.num_edge_switches, self.k
+        ).connectTo(OneOverGroupConnector, self.num_edge_switches * self.host_per_edge)
+
+    @log_write
     def build_nodes(self, **kwargs):
         total_switches = (
             self.num_core_switches + self.num_agg_switches + self.num_edge_switches

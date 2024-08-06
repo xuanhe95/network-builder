@@ -24,6 +24,36 @@ class LevelConnector(ABC):
     def finished(self):
         pass
 
+    def connectTo(self, cls, next_level_nodes, group=1, **kwargs):
+        next_id = self.connect(**kwargs)
+        typeof = cls.__name__
+        instance = cls(
+            self.link_generator,
+            self.lower_level_nodes,
+            next_level_nodes,
+            next_id,
+            group,
+            **kwargs,
+        )
+        return instance
+
+
+class BaseConnector(LevelConnector):
+    def __init__(
+        self, link_generator, higher_level_nodes, lower_level_nodes, start_id, group=1
+    ):
+        super().__init__(
+            link_generator, higher_level_nodes, lower_level_nodes, start_id
+        )
+
+    def connect(self, **kwargs):
+
+        return self.start_id
+
+    @log_write
+    def finished(self):
+        return f"Links generated.\n"
+
 
 """
 upper level: connected by all nodes
@@ -33,7 +63,7 @@ lower level: connected step by step, step is divided by group
 
 class FullOverStepConnector(LevelConnector):
     def __init__(
-        self, link_generator, higher_level_nodes, lower_level_nodes, start_id, group
+        self, link_generator, higher_level_nodes, lower_level_nodes, start_id, group=1
     ):
         super().__init__(
             link_generator, higher_level_nodes, lower_level_nodes, start_id
@@ -92,6 +122,7 @@ class OneOverGroupConnector(LevelConnector):
         higher_level_nodes,
         lower_level_nodes,
         start_id,
+        group=1,
     ):
         super().__init__(
             link_generator, higher_level_nodes, lower_level_nodes, start_id
@@ -135,7 +166,7 @@ class GroupOverGroupConnector(LevelConnector):
         higher_level_nodes,
         lower_level_nodes,
         start_id,
-        group,
+        group=1,
     ):
         super().__init__(
             link_generator, higher_level_nodes, lower_level_nodes, start_id

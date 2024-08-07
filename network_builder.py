@@ -40,25 +40,6 @@ class SpineLeafBuilder(NetworkBuilder):
         return f"Spine-Leaf topology generated.\n"
 
     @log_write
-    def link_construct(self, **kwargs):
-        self.build_nodes()
-        self.build_switches()
-
-        LevelConnector.START(
-            self.link_strategy,
-            self.num_spine_switches,
-            **kwargs,
-        ).connectTo(
-            FullMeshConnector,
-            self.num_leaf_switches,
-        ).connectTo(
-            OneOverGroupConnector,
-            self.num_leaf_switches * self.host_per_leaf,
-        ).END()
-
-        return f"Spine leaf links generated"
-
-    @log_write
     def build_nodes(self, **kwargs):
         total_switches = self.num_spine_switches + self.num_leaf_switches
         total_hosts = self.num_leaf_switches * self.host_per_leaf
@@ -82,23 +63,17 @@ class SpineLeafBuilder(NetworkBuilder):
 
     @log_write
     def build_links(self, **kwargs):
-        level0 = FullMeshConnector(
+        LevelConnector.START(
             self.link_strategy,
             self.num_spine_switches,
+            **kwargs,
+        ).connectTo(
+            FullMeshConnector,
             self.num_leaf_switches,
-            0,
-        )
-
-        id = level0.connect(**kwargs)
-
-        level1 = OneOverGroupConnector(
-            self.link_strategy,
-            self.num_leaf_switches,
+        ).connectTo(
+            OneOverGroupConnector,
             self.num_leaf_switches * self.host_per_leaf,
-            id,
-        )
-
-        level1.connect(**kwargs)
+        ).END()
 
         return f"Spine leaf links generated.\n"
 
@@ -125,30 +100,6 @@ class FatTreeBuilder(NetworkBuilder):
         self.build_nodes()
         self.build_switches()
         self.build_links(**kwargs)
-        return f"Fat Tree topology generated.\n"
-
-    @log_write
-    def link_construct(self, **kwargs):
-        self.build_nodes()
-        self.build_switches()
-
-        LevelConnector.START(
-            self.link_strategy,
-            self.num_core_switches,
-            **kwargs,
-        ).connectTo(
-            OneOverStepConnector,
-            self.num_agg_switches,
-            self.k,
-        ).connectTo(
-            GroupOverGroupConnector,
-            self.num_edge_switches,
-            self.k,
-        ).connectTo(
-            OneOverGroupConnector,
-            self.num_edge_switches * self.host_per_edge,
-        ).END()
-
         return f"Fat Tree topology generated.\n"
 
     @log_write
@@ -179,34 +130,22 @@ class FatTreeBuilder(NetworkBuilder):
 
     @log_write
     def build_links(self, **kwargs):
-        level0 = OneOverStepConnector(
+        LevelConnector.START(
             self.link_strategy,
             self.num_core_switches,
+            **kwargs,
+        ).connectTo(
+            OneOverStepConnector,
             self.num_agg_switches,
-            0,
             self.k,
-        )
-
-        id = level0.connect(**kwargs)
-
-        level1 = GroupOverGroupConnector(
-            self.link_strategy,
-            self.num_agg_switches,
+        ).connectTo(
+            GroupOverGroupConnector,
             self.num_edge_switches,
-            id,
             self.k,
-        )
-
-        id = level1.connect(**kwargs)
-
-        level2 = OneOverGroupConnector(
-            self.link_strategy,
-            self.num_edge_switches,
+        ).connectTo(
+            OneOverGroupConnector,
             self.num_edge_switches * self.host_per_edge,
-            id,
-        )
-
-        level2.connect(**kwargs)
+        ).END()
 
         return f"Links generated.\n"
 
@@ -228,27 +167,6 @@ class BCubeBuilder(NetworkBuilder):
         self.build_switches()
         self.build_links(**kwargs)
         return f"BCube topology generated.\n"
-
-    @log_write
-    def link_construct(self, **kwargs):
-        self.build_nodes()
-        self.build_switches()
-
-        LevelConnector.START(
-            self.link_strategy,
-            self.one_level_switches,
-            **kwargs,
-        ).connectTo(
-            OneOverStepConnector,
-            self.total_hosts,
-            self.n,
-        ).connectTo(
-            GroupOverOneConnector,
-            self.one_level_switches,
-            self.n,
-        ).END()
-
-        return f"BCube topology generated"
 
     @log_write
     def build_nodes(self, **kwargs):
@@ -282,22 +200,17 @@ class BCubeBuilder(NetworkBuilder):
 
     @log_write
     def build_links(self, **kwargs):
-        level0 = OneOverStepConnector(
+        LevelConnector.START(
             self.link_strategy,
             self.one_level_switches,
+            **kwargs,
+        ).connectTo(
+            OneOverStepConnector,
             self.total_hosts,
-            0,
             self.n,
-        )
-        id = level0.connect(**kwargs)
-
-        level1 = GroupOverOneConnector(
-            self.link_strategy,
-            self.total_hosts,
+        ).connectTo(
+            GroupOverOneConnector,
             self.one_level_switches,
-            id,
             self.n,
-        )
-        level1.connect(**kwargs)
-
+        ).END()
         return f"Links generated.\n"

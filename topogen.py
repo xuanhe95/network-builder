@@ -34,7 +34,7 @@ def generate_spine_leaf(topo_file, flow_file, link=0, flow=0):
     flow = flow_strategy.DefaultFlowStrategy(flow_output)
     linker = link_strategy.DefaultLinkStrategy(output, flow)
 
-    network_builder.SpineLeafBuilder(linker).link_construct(
+    network_builder.SpineLeafBuilder(linker).construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
 
@@ -45,7 +45,7 @@ def generate_fat_tree(topo_file, flow_file, link=0, flow=0):
     flow = flow_strategy.DefaultFlowStrategy(flow_output)
     linker = link_strategy.DefaultLinkStrategy(output, flow)
 
-    network_builder.FatTreeBuilder(linker, 4).link_construct(
+    network_builder.FatTreeBuilder(linker, 4).construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
 
@@ -56,7 +56,7 @@ def generate_bcube(topo_file, flow_file, link=0, flow=0):
     flow = flow_strategy.DefaultFlowStrategy(flow_output)
     linker = link_strategy.DefaultLinkStrategy(output, flow)
 
-    network_builder.BCubeBuilder(linker, 4).link_construct(
+    network_builder.BCubeBuilder(linker, 4).construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
 

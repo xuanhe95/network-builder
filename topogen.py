@@ -51,7 +51,7 @@ def generate_fat_tree(topo_file, flow_file, link=0, flow=0):
 
 
 def generate_bcube(topo_file, flow_file, link=0, flow=0):
-    output = output_strategy.FileOutputStrategy("topology.txt")
+    output = output_strategy.FileOutputStrategy()
     flow_output = output_strategy.FileOutputStrategy("flow.txt")
     flow = flow_strategy.DefaultFlowStrategy(flow_output)
     linker = link_strategy.DefaultLinkStrategy(output, flow)

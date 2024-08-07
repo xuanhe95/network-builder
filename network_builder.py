@@ -137,7 +137,7 @@ class FatTreeBuilder(NetworkBuilder):
             self.num_core_switches,
             **kwargs,
         ).connectTo(
-            FullOverStepConnector,
+            OneOverStepConnector,
             self.num_agg_switches,
             self.k,
         ).connectTo(
@@ -179,7 +179,7 @@ class FatTreeBuilder(NetworkBuilder):
 
     @log_write
     def build_links(self, **kwargs):
-        level0 = FullOverStepConnector(
+        level0 = OneOverStepConnector(
             self.link_strategy,
             self.num_core_switches,
             self.num_agg_switches,
@@ -239,7 +239,7 @@ class BCubeBuilder(NetworkBuilder):
             self.one_level_switches,
             **kwargs,
         ).connectTo(
-            FullOverStepConnector,
+            OneOverStepConnector,
             self.total_hosts,
             self.n,
         ).connectTo(
@@ -282,7 +282,7 @@ class BCubeBuilder(NetworkBuilder):
 
     @log_write
     def build_links(self, **kwargs):
-        level0 = FullOverStepConnector(
+        level0 = OneOverStepConnector(
             self.link_strategy,
             self.one_level_switches,
             self.total_hosts,

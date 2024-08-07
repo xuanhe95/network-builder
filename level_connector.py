@@ -13,7 +13,6 @@ class LevelConnector(ABC):
         **kwargs,
     ):
         self.link_strategy = link_strategy
-
         self.higher_level_nodes = higher_level_nodes
         self.lower_level_nodes = lower_level_nodes
         self.start_id = start_id
@@ -23,9 +22,10 @@ class LevelConnector(ABC):
     def connect(self):
         pass
 
-    @abstractmethod
+    @log_write
     def finished(self):
-        pass
+        name = self.__class__.__name__
+        return f"{name} level connected."
 
     def connectTo(self, cls, next_level_nodes, group=1):
         next_id = self.connect()
@@ -66,9 +66,6 @@ class BaseConnector(LevelConnector):
     def connect(self):
         return 0
 
-    def finished(self):
-        return f"Links generated.\n"
-
 
 """
 upper level: connected by all nodes
@@ -76,7 +73,7 @@ lower level: connected step by step, step is divided by group
 """
 
 
-class FullOverStepConnector(LevelConnector):
+class OneOverStepConnector(LevelConnector):
     def __init__(
         self,
         link_strategy,
@@ -97,7 +94,7 @@ class FullOverStepConnector(LevelConnector):
         )
         self.higher_level_nodes_group = self.lower_level_nodes_per_group
 
-    def connect(self, **kwargs):
+    def connect(self):
 
         last_id = self.start_id + self.higher_level_nodes
 
@@ -125,10 +122,6 @@ class FullOverStepConnector(LevelConnector):
 
         return last_id
 
-    @log_write
-    def finished(self):
-        return f"Core and Agg links generated.\n"
-
 
 """
 upper level: connected one by one
@@ -153,26 +146,23 @@ class OneOverGroupConnector(LevelConnector):
         self.host_leftover = self.lower_level_nodes % self.higher_level_nodes
 
     def connect(self):
-        start_id = self.start_id
-        link_id = self.start_id + self.higher_level_nodes
+        last_id = self.start_id + self.higher_level_nodes
 
-        for leaf in range(self.higher_level_nodes):
-            for host in range(self.host_per_leaf):
+        for higher_node in range(self.higher_level_nodes):
+            higher_node_index = self.start_id + higher_node
+            for lower_node in range(self.host_per_leaf):
+                lower_node_index = (
+                    last_id + higher_node * self.host_per_leaf + lower_node
+                )
                 self.link_strategy.link(
-                    start_id,
-                    link_id,
+                    higher_node_index,
+                    lower_node_index,
                     **self.kwargs,
                 )
-                link_id += 1
-            start_id += 1
 
-            self.finished()
+        self.finished()
 
-        return start_id
-
-    @log_write
-    def finished(self):
-        return f"Leaf and Host links generated.\n"
+        return last_id
 
 
 """
@@ -219,10 +209,6 @@ class GroupOverGroupConnector(LevelConnector):
 
         return last_id
 
-    @log_write
-    def finished(self):
-        return f"Spine and Leaf links generated.\n"
-
 
 class FullMeshConnector(LevelConnector):
     def __init__(
@@ -254,10 +240,6 @@ class FullMeshConnector(LevelConnector):
         self.finished()
 
         return last_id
-
-    @log_write
-    def finished(self):
-        return f"Full mesh links generated.\n"
 
 
 class GroupOverOneConnector(LevelConnector):
@@ -296,7 +278,3 @@ class GroupOverOneConnector(LevelConnector):
         self.finished()
 
         return last_id
-
-    @log_write
-    def finished(self):
-        return f"Group over one links generated.\n"

@@ -17,46 +17,55 @@ class LevelConnector(ABC):
         self.higher_level_nodes = higher_level_nodes
         self.lower_level_nodes = lower_level_nodes
         self.start_id = start_id
+        self.kwargs = kwargs
 
     @abstractmethod
-    def connect(self, **kwargs):
+    def connect(self):
         pass
 
     @abstractmethod
     def finished(self):
         pass
 
-    def connectTo(self, cls, next_level_nodes, group=1, **kwargs):
-        next_id = self.connect(**kwargs)
+    def connectTo(self, cls, next_level_nodes, group=1):
+        next_id = self.connect()
         typeof = cls.__name__
+
         instance = cls(
             self.link_strategy,
             self.lower_level_nodes,
             next_level_nodes,
             next_id,
             group,
+            **self.kwargs,
+        )
+
+        return instance
+
+    @staticmethod
+    def START(link_strategy, nodes, **kwargs):
+        return BaseConnector(
+            link_strategy,
+            nodes,
             **kwargs,
         )
-        return instance
+
+    def END(self):
+        self.connect()
 
 
 class BaseConnector(LevelConnector):
     def __init__(
         self,
         link_strategy,
-        higher_level_nodes,
-        lower_level_nodes,
-        start_id,
-        group=1,
+        nodes,
         **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(link_strategy, nodes, nodes, 0, **kwargs)
 
-    def connect(self, **kwargs):
+    def connect(self):
+        return 0
 
-        return self.start_id
-
-    @log_write
     def finished(self):
         return f"Links generated.\n"
 
@@ -77,7 +86,9 @@ class FullOverStepConnector(LevelConnector):
         group=1,
         **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(
+            link_strategy, higher_level_nodes, lower_level_nodes, start_id, **kwargs
+        )
         self.group = group
 
         self.lower_level_nodes_per_group = self.lower_level_nodes // self.group
@@ -107,7 +118,7 @@ class FullOverStepConnector(LevelConnector):
                     self.link_strategy.link(
                         higher_node_index,
                         lower_node_index,
-                        **kwargs,
+                        **self.kwargs,
                     )
 
         self.finished()
@@ -135,11 +146,13 @@ class OneOverGroupConnector(LevelConnector):
         group=1,
         **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(
+            link_strategy, higher_level_nodes, lower_level_nodes, start_id, **kwargs
+        )
         self.host_per_leaf = self.lower_level_nodes // self.higher_level_nodes
         self.host_leftover = self.lower_level_nodes % self.higher_level_nodes
 
-    def connect(self, **kwargs):
+    def connect(self):
         start_id = self.start_id
         link_id = self.start_id + self.higher_level_nodes
 
@@ -148,7 +161,7 @@ class OneOverGroupConnector(LevelConnector):
                 self.link_strategy.link(
                     start_id,
                     link_id,
-                    **kwargs,
+                    **self.kwargs,
                 )
                 link_id += 1
             start_id += 1
@@ -178,13 +191,15 @@ class GroupOverGroupConnector(LevelConnector):
         group=1,
         **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(
+            link_strategy, higher_level_nodes, lower_level_nodes, start_id, **kwargs
+        )
 
         self.group = group
         self.higher_level_nodes_per_group = self.higher_level_nodes // self.group
         self.lower_level_nodes_per_group = self.lower_level_nodes // self.group
 
-    def connect(self, **kwargs):
+    def connect(self):
         last_id = self.start_id + self.higher_level_nodes
 
         for group in range(self.group):
@@ -197,7 +212,7 @@ class GroupOverGroupConnector(LevelConnector):
                     self.link_strategy.link(
                         higher_node_index + higher_node,
                         lower_node_index + lower_node,
-                        **kwargs,
+                        **self.kwargs,
                     )
 
         self.finished()
@@ -211,11 +226,19 @@ class GroupOverGroupConnector(LevelConnector):
 
 class FullMeshConnector(LevelConnector):
     def __init__(
-        self, link_strategy, higher_level_nodes, lower_level_nodes, start_id, group=1
+        self,
+        link_strategy,
+        higher_level_nodes,
+        lower_level_nodes,
+        start_id,
+        group=1,
+        **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(
+            link_strategy, higher_level_nodes, lower_level_nodes, start_id, **kwargs
+        )
 
-    def connect(self, **kwargs):
+    def connect(self):
         last_id = self.start_id + self.higher_level_nodes
 
         for higher_node in range(self.higher_level_nodes):
@@ -225,7 +248,7 @@ class FullMeshConnector(LevelConnector):
                 self.link_strategy.link(
                     higher_node_index,
                     lower_node_index,
-                    **kwargs,
+                    **self.kwargs,
                 )
 
         self.finished()
@@ -247,11 +270,13 @@ class GroupOverOneConnector(LevelConnector):
         group=1,
         **kwargs,
     ):
-        super().__init__(link_strategy, higher_level_nodes, lower_level_nodes, start_id)
+        super().__init__(
+            link_strategy, higher_level_nodes, lower_level_nodes, start_id, **kwargs
+        )
         self.group = group
         self.higher_level_nodes_per_group = self.higher_level_nodes // self.group
 
-    def connect(self, **kwargs):
+    def connect(self):
         last_id = self.start_id + self.higher_level_nodes
 
         for group in range(self.group):
@@ -265,7 +290,7 @@ class GroupOverOneConnector(LevelConnector):
                 self.link_strategy.link(
                     higher_node_index,
                     lower_node_index,
-                    **kwargs,
+                    **self.kwargs,
                 )
 
         self.finished()

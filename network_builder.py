@@ -43,16 +43,18 @@ class SpineLeafBuilder(NetworkBuilder):
     def link_construct(self, **kwargs):
         self.build_nodes()
         self.build_switches()
-        connector = FullMeshConnector(
+
+        LevelConnector.START(
             self.link_strategy,
             self.num_spine_switches,
+            **kwargs,
+        ).connectTo(
+            FullMeshConnector,
             self.num_leaf_switches,
-            0,
-        )
-
-        connector.connectTo(
-            OneOverGroupConnector, self.num_leaf_switches * self.host_per_leaf, **kwargs
-        ).connect()
+        ).connectTo(
+            OneOverGroupConnector,
+            self.num_leaf_switches * self.host_per_leaf,
+        ).END()
 
         return f"Spine leaf links generated"
 
@@ -129,19 +131,23 @@ class FatTreeBuilder(NetworkBuilder):
     def link_construct(self, **kwargs):
         self.build_nodes()
         self.build_switches()
-        connector = FullOverStepConnector(
+
+        LevelConnector.START(
             self.link_strategy,
             self.num_core_switches,
-            self.num_agg_switches,
-            0,
-            self.k,
-        )
-
-        connector.connectTo(
-            GroupOverGroupConnector, self.num_edge_switches, self.k, **kwargs
+            **kwargs,
         ).connectTo(
-            OneOverGroupConnector, self.num_edge_switches * self.host_per_edge, **kwargs
-        ).connect()
+            FullOverStepConnector,
+            self.num_agg_switches,
+            self.k,
+        ).connectTo(
+            GroupOverGroupConnector,
+            self.num_edge_switches,
+            self.k,
+        ).connectTo(
+            OneOverGroupConnector,
+            self.num_edge_switches * self.host_per_edge,
+        ).END()
 
         return f"Fat Tree topology generated.\n"
 
@@ -227,20 +233,20 @@ class BCubeBuilder(NetworkBuilder):
     def link_construct(self, **kwargs):
         self.build_nodes()
         self.build_switches()
-        connector = FullOverStepConnector(
+
+        LevelConnector.START(
             self.link_strategy,
             self.one_level_switches,
+            **kwargs,
+        ).connectTo(
+            FullOverStepConnector,
             self.total_hosts,
-            0,
             self.n,
-        )
-
-        connector.connectTo(
+        ).connectTo(
             GroupOverOneConnector,
             self.one_level_switches,
             self.n,
-            **kwargs,
-        ).connect()
+        ).END()
 
         return f"BCube topology generated"
 

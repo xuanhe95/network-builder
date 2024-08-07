@@ -23,7 +23,7 @@ class DefaultLinkStrategy(LinkStrategy):
 
     @log_write
     def link(self, src, dst, **kwargs):
-        bandwidth = kwargs.get("bandwidth", "10Gbps")
+        bandwidth = kwargs.get("bandwidth", "0Gbps")
         delay = kwargs.get("delay", "0ms")
         error_rate = kwargs.get("error_rate", 0)
 
@@ -53,7 +53,7 @@ class HalfLinkStrategy(LinkStrategy):
     @log_write
     def link(self, src, dst, **kwargs):
 
-        bandwidth = kwargs.get("bandwidth", "10Gbps")
+        bandwidth = kwargs.get("bandwidth", "0Gbps")
         delay = kwargs.get("delay", "0ms")
         error_rate = kwargs.get("error_rate", 0)
 

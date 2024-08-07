@@ -31,37 +31,34 @@ def generate_switches(f, total_switches):
 def generate_spine_leaf(topo_file, flow_file, link=0, flow=0):
     output = output_strategy.FileOutputStrategy("topology.txt")
     flow_output = output_strategy.FileOutputStrategy("flow.txt")
-    flow = flow_strategy.HalfFlowStrategy(flow_output)
-    linker = link_strategy.HalfLinkStrategy(output, flow)
+    flow = flow_strategy.DefaultFlowStrategy(flow_output)
+    linker = link_strategy.DefaultLinkStrategy(output, flow)
 
-    network_builder.SpineLeafBuilder(linker).construct(
+    network_builder.SpineLeafBuilder(linker).link_construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
-    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
 
 
 def generate_fat_tree(topo_file, flow_file, link=0, flow=0):
     output = output_strategy.FileOutputStrategy("topology.txt")
     flow_output = output_strategy.FileOutputStrategy("flow.txt")
-    flow = flow_strategy.HalfFlowStrategy(flow_output)
-    linker = link_strategy.HalfLinkStrategy(output, flow)
+    flow = flow_strategy.DefaultFlowStrategy(flow_output)
+    linker = link_strategy.DefaultLinkStrategy(output, flow)
 
     network_builder.FatTreeBuilder(linker, 4).link_construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
-    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
 
 
 def generate_bcube(topo_file, flow_file, link=0, flow=0):
     output = output_strategy.FileOutputStrategy("topology.txt")
     flow_output = output_strategy.FileOutputStrategy("flow.txt")
-    flow = flow_strategy.HalfFlowStrategy(flow_output)
-    linker = link_strategy.HalfLinkStrategy(output, flow)
+    flow = flow_strategy.DefaultFlowStrategy(flow_output)
+    linker = link_strategy.DefaultLinkStrategy(output, flow)
 
     network_builder.BCubeBuilder(linker, 4).link_construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
-    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
 
 
 if __name__ == "__main__":

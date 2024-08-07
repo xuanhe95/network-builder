@@ -1,7 +1,7 @@
 import argparse
 from datetime import datetime
-from network_builder import FatTreeBuilder
-import node_linker
+import network_builder
+import link_strategy
 import output_strategy
 import flow_strategy
 
@@ -10,6 +10,7 @@ SPINE_SWITCHES = 2
 LEAF_SWITCHES = 3
 HOSTS_PER_LEAF = 3
 FILENAME = "topology.txt"
+FLOW_FILENAME = "flow.txt"
 SWITCH_TO_SWITCH_BANDWIDTH = "100Gbps"
 SWITCH_TO_SWITCH_DELAY = "0.001ms"
 SWITCH_TO_SWITCH_ERROR_RATE = "0"
@@ -27,13 +28,37 @@ def generate_switches(f, total_switches):
     return f"Switches: {output}"
 
 
-def generate_fat_tree():
+def generate_spine_leaf(topo_file, flow_file, link=0, flow=0):
     output = output_strategy.FileOutputStrategy("topology.txt")
     flow_output = output_strategy.FileOutputStrategy("flow.txt")
-    flow_strategy_ = flow_strategy.HalfFlowStrategy(flow_output)
-    linker = node_linker.HalfNodeLinker(output, flow_strategy_)
+    flow = flow_strategy.HalfFlowStrategy(flow_output)
+    linker = link_strategy.HalfLinkStrategy(output, flow)
 
-    FatTreeBuilder(linker, 4).link_construct(
+    network_builder.SpineLeafBuilder(linker).construct(
+        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+    )
+    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
+
+
+def generate_fat_tree(topo_file, flow_file, link=0, flow=0):
+    output = output_strategy.FileOutputStrategy("topology.txt")
+    flow_output = output_strategy.FileOutputStrategy("flow.txt")
+    flow = flow_strategy.HalfFlowStrategy(flow_output)
+    linker = link_strategy.HalfLinkStrategy(output, flow)
+
+    network_builder.FatTreeBuilder(linker, 4).link_construct(
+        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+    )
+    # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
+
+
+def generate_bcube(topo_file, flow_file, link=0, flow=0):
+    output = output_strategy.FileOutputStrategy("topology.txt")
+    flow_output = output_strategy.FileOutputStrategy("flow.txt")
+    flow = flow_strategy.HalfFlowStrategy(flow_output)
+    linker = link_strategy.HalfLinkStrategy(output, flow)
+
+    network_builder.BCubeBuilder(linker, 4).link_construct(
         bandwidth="100Gbps", delay="0.001ms", error_rate="0"
     )
     # FatTreeBuilder(6, bandwidth="100Gbps", delay="0.001ms", error_rate="0").construct()
@@ -70,6 +95,13 @@ if __name__ == "__main__":
         type=str,
         default=FILENAME,
         help="Output filename prefix",
+    )
+    parser.add_argument(
+        "-ff",
+        "--flow_file",
+        type=str,
+        default=FLOW_FILENAME,
+        help="Flow filename",
     )
     parser.add_argument(
         "-ssb",
@@ -116,17 +148,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # generate_topology_file(
-    #     args.spine,
-    #     args.leaf,
-    #     args.host,
-    #     args.filename,
-    #     args.switch_to_switch_bandwidth,
-    #     args.switch_to_switch_delay,
-    #     args.switch_to_switch_error_rate,
-    #     args.switch_to_host_bandwidth,
-    #     args.switch_to_host_delay,
-    #     args.switch_to_host_error_rate,
-    # )
-
-    generate_fat_tree()
+    generate_fat_tree(args.filename, args.flow_file)
+    generate_spine_leaf(args.filename, args.flow_file)
+    generate_bcube(args.filename, args.flow_file)

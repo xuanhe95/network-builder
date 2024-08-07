@@ -1,10 +1,8 @@
 from logger import log_write
 from abc import ABC, abstractmethod
-import output_strategy
-import flow_strategy
 
 
-class NodeLinker(ABC):
+class LinkStrategy(ABC):
     def __init__(
         self,
         output,
@@ -21,7 +19,7 @@ class NodeLinker(ABC):
         return self.output
 
 
-class DefaultNodeLinker(NodeLinker):
+class DefaultLinkStrategy(LinkStrategy):
 
     @log_write
     def link(self, src, dst, **kwargs):
@@ -41,7 +39,7 @@ class DefaultNodeLinker(NodeLinker):
         return self.flow_strategy.next(src, dst, **kwargs)
 
 
-class HalfNodeLinker(NodeLinker):
+class HalfLinkStrategy(LinkStrategy):
 
     def __init__(
         self,

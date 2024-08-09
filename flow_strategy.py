@@ -18,6 +18,7 @@ class FlowStrategy(ABC):
 
 
 class DefaultFlowStrategy(FlowStrategy):
+    @log_write
     def next(self, src, dst, **kwargs):
         pfc_priority = kwargs.get("pfc_priority", 0)
         port = kwargs.get("port", 0)
@@ -32,6 +33,7 @@ class DefaultFlowStrategy(FlowStrategy):
 
 
 class RandomFlowStrategy(FlowStrategy):
+    @log_write
     def next(self, src, dst, **kwargs):
 
         pfc_priority = kwargs.get("pfc_priority", 0)

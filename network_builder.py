@@ -44,7 +44,9 @@ We can specify the number of spine switches, leaf switches, and hosts per leaf t
 
 
 class SpineLeafBuilder(NetworkBuilder):
-    def __init__(self, link_strategy, spine=2, leaf=3, host_per_leaf=3, **kwargs):
+    def __init__(
+        self, link_strategy, flow_strategy, spine=2, leaf=3, host_per_leaf=3, **kwargs
+    ):
         self.output = link_strategy.get_output()
         self.link_strategy = link_strategy
         self.num_spine_switches = spine
@@ -109,6 +111,7 @@ class FatTreeBuilder(NetworkBuilder):
     def __init__(
         self,
         link_strategy,
+        flow_strategy,
         k=4,
         host_per_edge=3,
         **kwargs,
@@ -185,7 +188,13 @@ to generate the topology.
 
 
 class BCubeBuilder(NetworkBuilder):
-    def __init__(self, link_strategy, n=4, **kwargs):
+    def __init__(
+        self,
+        link_strategy,
+        flow_strategy,
+        n=4,
+        **kwargs,
+    ):
         self.output = link_strategy.get_output()
         self.link_strategy = link_strategy
         self.n = n

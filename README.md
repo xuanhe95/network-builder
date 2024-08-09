@@ -4,8 +4,9 @@ This library provides an abstraction for building various network topologies suc
 
 # Components
 
-## Topo Builder
+## Network Builder
 
+NetworkBuilder is an abstract base class designed to construct network topologies. It provides the framework for building nodes, switches, and links within a network by using various LevelConnector strategies. The subclasses implement specific network topologies like Spine-Leaf, Fat-Tree, and BCube.
 
 ## Level Connector
 
@@ -19,16 +20,26 @@ The LevelConnector class provides the foundation for connecting nodes between le
 #### Attributes:
 
 link_strategy: Strategy pattern for linking nodes.
+
 higher_level_nodes: Nodes in the higher level to be connected.
+
 lower_level_nodes: Nodes in the lower level to be connected.
+
 start_id: Starting index for connecting nodes.
+
 kwargs: Additional arguments for customization.
+
+
 Methods:
 
 connect(): Abstract method to be implemented by subclasses for connecting nodes.
+
 finished(): Logs the completion of the connection process.
+
 connectTo(cls, next_level_nodes, group=1): Facilitates method chaining for connecting nodes across multiple levels.
+
 START(link_strategy, nodes, **kwargs): Static method to initiate the connection process.
+
 END(): Finalizes the connection process.
 
 
@@ -55,10 +66,19 @@ Implements a full mesh connection, where every node in the upper level is connec
 Connects groups of nodes in the upper level to individual nodes in the lower level, ideal for scenarios where specific groupings need to connect to single nodes.
 
     
-### Link Strategy
+## Link Strategy
+
+LinkStrategy is an abstract base class designed for creating links between nodes in a network. The class provides a flexible framework for defining different linking strategies, allowing for customization in terms of bandwidth, delay, error rates, and other network parameters.
+
+## Flow Strategy
+
+Waiting for implementation
+
+## Output Strategy
 
 
+OutputStrategy is an abstract base class designed for data output. It allows different implementations for outputting data to various destinations, such as files or the console. This flexible design lets users choose the appropriate output strategy based on their needs.
 
-### Flow Strategy
 
-### Output Strategy
+### OutputStrategy (Abstract Base Class)
+Defines the abstract method write(data: str), which must be implemented by subclasses to specify the output logic.

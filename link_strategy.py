@@ -11,10 +11,8 @@ class LinkStrategy(ABC):
     def __init__(
         self,
         output,
-        flow_strategy,
     ):
         self.output = output
-        self.flow_strategy = flow_strategy
 
     @abstractmethod
     def link(self, **kwargs):
@@ -42,12 +40,7 @@ class DefaultLinkStrategy(LinkStrategy):
 
         self.output.write(output)
 
-        self.create_flow(src, dst, **kwargs)
-
         return f"Connected {src} to {dst} with {bandwidth} bandwidth, {delay} delay, and {error_rate} error rate.\n"
-
-    def create_flow(self, src, dst, **kwargs):
-        return self.flow_strategy.next(src, dst, **kwargs)
 
 
 class HalfLinkStrategy(LinkStrategy):
@@ -68,6 +61,7 @@ class HalfLinkStrategy(LinkStrategy):
         delay = kwargs.get("delay", "0ms")
         error_rate = kwargs.get("error_rate", 0)
 
+        # skip every other link
         if self.id % 2 == 0:
             error_rate = 0.5
             delay = "10ms"
@@ -78,9 +72,4 @@ class HalfLinkStrategy(LinkStrategy):
 
         self.output.write(output)
 
-        self.create_flow(src, dst, **kwargs)
-
         return f"Connected {src} to {dst} with {bandwidth} bandwidth, {delay} delay, and {error_rate} error rate.\n"
-
-    def create_flow(self, src, dst, **kwargs):
-        return self.flow_strategy.next(src, dst, **kwargs)

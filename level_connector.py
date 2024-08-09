@@ -1,5 +1,13 @@
 from abc import ABC, abstractmethod
+
 from link_strategy import *
+
+"""
+LevelConnector is the abstraction for connecting nodes in different levels of the topology.
+The abstract method connect will connect the nodes between the levels.
+
+We can implement different connection strategies for different topologies.
+"""
 
 
 class LevelConnector(ABC):
@@ -17,6 +25,11 @@ class LevelConnector(ABC):
         self.start_id = start_id
         self.kwargs = kwargs
 
+    """
+    This method is the connection logic for the nodes between two levels.
+    It will return the first index of the lower level nodes for the next level connection.
+    """
+
     @abstractmethod
     def connect(self):
         pass
@@ -25,6 +38,10 @@ class LevelConnector(ABC):
     def finished(self):
         name = self.__class__.__name__
         return f"{name} level connected."
+
+    """
+    This method is for method chaining.
+    """
 
     def connectTo(self, cls, next_level_nodes, group=1):
         next_id = self.connect()
@@ -51,6 +68,12 @@ class LevelConnector(ABC):
 
     def END(self):
         self.connect()
+
+
+"""
+This class is used for method chaining.
+Do not use this class directly.
+"""
 
 
 class BaseConnector(LevelConnector):
@@ -95,7 +118,7 @@ class OneOverStepConnector(LevelConnector):
 
     def connect(self):
 
-        last_id = self.start_id + self.higher_level_nodes
+        lower_level_first_index = self.start_id + self.higher_level_nodes
 
         for higher_node_group in range(self.higher_level_nodes_group):
             for higher_node in range(self.higher_level_nodes_per_group):
@@ -106,7 +129,7 @@ class OneOverStepConnector(LevelConnector):
                 )
                 for group in range(self.group):
                     lower_node_index = (
-                        last_id
+                        lower_level_first_index
                         + group * self.lower_level_nodes_per_group
                         + higher_node_group
                     )
@@ -119,7 +142,7 @@ class OneOverStepConnector(LevelConnector):
 
         self.finished()
 
-        return last_id
+        return lower_level_first_index
 
 
 """
@@ -145,13 +168,15 @@ class OneOverGroupConnector(LevelConnector):
         self.host_leftover = self.lower_level_nodes % self.higher_level_nodes
 
     def connect(self):
-        last_id = self.start_id + self.higher_level_nodes
+        lower_level_first_index = self.start_id + self.higher_level_nodes
 
         for higher_node in range(self.higher_level_nodes):
             higher_node_index = self.start_id + higher_node
             for lower_node in range(self.host_per_leaf):
                 lower_node_index = (
-                    last_id + higher_node * self.host_per_leaf + lower_node
+                    lower_level_first_index
+                    + higher_node * self.host_per_leaf
+                    + lower_node
                 )
                 self.link_strategy.link(
                     higher_node_index,
@@ -161,7 +186,7 @@ class OneOverGroupConnector(LevelConnector):
 
         self.finished()
 
-        return last_id
+        return lower_level_first_index
 
 
 """
@@ -189,7 +214,7 @@ class GroupOverGroupConnector(LevelConnector):
         self.lower_level_nodes_per_group = self.lower_level_nodes // self.group
 
     def connect(self):
-        last_id = self.start_id + self.higher_level_nodes
+        lower_level_first_index = self.start_id + self.higher_level_nodes
 
         for group in range(self.group):
             higher_node_index = (
@@ -206,7 +231,13 @@ class GroupOverGroupConnector(LevelConnector):
 
         self.finished()
 
-        return last_id
+        return lower_level_first_index
+
+
+"""
+upper level: connected all nodes
+lower level: connected all nodes
+"""
 
 
 class FullMeshConnector(LevelConnector):
@@ -224,12 +255,12 @@ class FullMeshConnector(LevelConnector):
         )
 
     def connect(self):
-        last_id = self.start_id + self.higher_level_nodes
+        lower_level_first_index = self.start_id + self.higher_level_nodes
 
         for higher_node in range(self.higher_level_nodes):
             higher_node_index = self.start_id + higher_node
             for lower_node in range(self.lower_level_nodes):
-                lower_node_index = last_id + lower_node
+                lower_node_index = lower_level_first_index + lower_node
                 self.link_strategy.link(
                     higher_node_index,
                     lower_node_index,
@@ -238,7 +269,13 @@ class FullMeshConnector(LevelConnector):
 
         self.finished()
 
-        return last_id
+        return lower_level_first_index
+
+
+"""
+upper level: connected group by group
+lower level: connected one by one
+"""
 
 
 class GroupOverOneConnector(LevelConnector):
@@ -258,7 +295,7 @@ class GroupOverOneConnector(LevelConnector):
         self.higher_level_nodes_per_group = self.higher_level_nodes // self.group
 
     def connect(self):
-        last_id = self.start_id + self.higher_level_nodes
+        lower_level_first_index = self.start_id + self.higher_level_nodes
 
         for group in range(self.group):
             for higher_node in range(self.higher_level_nodes_per_group):
@@ -267,7 +304,7 @@ class GroupOverOneConnector(LevelConnector):
                     + group * self.higher_level_nodes_per_group
                     + higher_node
                 )
-                lower_node_index = last_id + group
+                lower_node_index = lower_level_first_index + group
                 self.link_strategy.link(
                     higher_node_index,
                     lower_node_index,
@@ -276,4 +313,4 @@ class GroupOverOneConnector(LevelConnector):
 
         self.finished()
 
-        return last_id
+        return lower_level_first_index

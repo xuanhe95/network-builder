@@ -1,6 +1,11 @@
 from logger import log_write
 from abc import ABC, abstractmethod
 
+"""
+LinkStrategy is the abstraction for creating links between two nodes.
+The link method will create a link relation between src and dst nodes.
+"""
+
 
 class LinkStrategy(ABC):
     def __init__(
@@ -17,6 +22,12 @@ class LinkStrategy(ABC):
 
     def get_output(self):
         return self.output
+
+
+"""
+DefaultLinkStrategy is the default strategy for creating links between nodes.
+It will create a link with the given bandwidth, delay, and error rate.
+"""
 
 
 class DefaultLinkStrategy(LinkStrategy):

@@ -19,15 +19,6 @@ SWITCH_TO_HOST_DELAY = "0.001ms"
 SWITCH_TO_HOST_ERROR_RATE = "0"
 
 
-def generate_switches(f, total_switches):
-    output = ""
-    for i in range(total_switches):
-        output += f"{i} "
-    output += "\n"
-    f.write(output)
-    return f"Switches: {output}"
-
-
 def generate_spine_leaf(topo_file, flow_file, link=0, flow=0):
     output = output_strategy.FileOutputStrategy("topology.txt")
     flow_output = output_strategy.FileOutputStrategy("flow.txt")

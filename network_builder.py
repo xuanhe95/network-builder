@@ -4,6 +4,14 @@ from link_strategy import *
 
 from level_connector import *
 
+"""
+NetworkBuilder is an abstract class that defines the methods that will be used to build the topology.
+It will direct the construction of the whole topology.
+
+The construct method will build the nodes, switches, and links by combining the LevelConnector.
+It also in charge of building the flows via FlowStrategy.
+"""
+
 
 class NetworkBuilder(ABC):
     @abstractmethod
@@ -21,6 +29,18 @@ class NetworkBuilder(ABC):
     @abstractmethod
     def build_links(self, **kwargs):
         pass
+
+    def build_flow(self, **kwargs):
+        pass
+
+    def build_flow_header(self, **kwargs):
+        pass
+
+
+"""
+SpineLeafBuilder will build a Spine-Leaf topology.
+We can specify the number of spine switches, leaf switches, and hosts per leaf to generate the topology.
+"""
 
 
 class SpineLeafBuilder(NetworkBuilder):
@@ -76,6 +96,13 @@ class SpineLeafBuilder(NetworkBuilder):
         ).END()
 
         return f"Spine leaf links generated.\n"
+
+
+"""
+FatTreeBuilder will build a Fat-Tree topology.
+We can specify the number of k, which is the number of switches per pod,
+and host per edge switches to generate the topology.
+"""
 
 
 class FatTreeBuilder(NetworkBuilder):
@@ -148,6 +175,13 @@ class FatTreeBuilder(NetworkBuilder):
         ).END()
 
         return f"Links generated.\n"
+
+
+"""
+BCubeBuilder will build a BCube topology.
+We can specify the number of n, which is the number of switches per level to generate the topology,
+to generate the topology.
+"""
 
 
 class BCubeBuilder(NetworkBuilder):

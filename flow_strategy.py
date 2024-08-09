@@ -2,6 +2,11 @@ from abc import ABC, abstractmethod
 import random
 from logger import log_write
 
+"""
+FlowStrategy is the abstraction for creating flows between two nodes.
+We can implement different flow strategies for different flow generation logic.
+"""
+
 
 class FlowStrategy(ABC):
     def __init__(self, output):

@@ -1,10 +1,20 @@
 from abc import ABC, abstractmethod
 
+"""
+OutputStrategy is an abstraction for data output.
+We can implement different output strategies for writing data to a file or console.
+"""
+
 
 class OutputStrategy(ABC):
     @abstractmethod
     def write(self, data: str):
         pass
+
+
+"""
+FileOutputStrategy is for writing data to a file.
+"""
 
 
 class FileOutputStrategy(OutputStrategy):
@@ -18,6 +28,11 @@ class FileOutputStrategy(OutputStrategy):
     # close the file when the object is deleted
     def __del__(self):
         self.file.close()
+
+
+"""
+ConsoleOutputStrategy is for writing data to the console.
+"""
 
 
 class ConsoleOutputStrategy(OutputStrategy):

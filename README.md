@@ -77,7 +77,7 @@ LinkStrategy is an abstract base class designed for creating links between nodes
 
 ## Flow Strategy
 
-Waiting for implementation
+FlowStragey is an abstract base class designed for creating flow files. It provides a flexible framework for defining different flow generation strategies, allowing for customization in terms of flow size, initiation time, and other flow parameters.
 
 ## Output Strategy
 

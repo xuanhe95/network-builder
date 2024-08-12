@@ -60,7 +60,13 @@ def generate_spine_leaf(
 ):
 
     network_builder.SpineLeafBuilder(link, flow, spine, leaf, host).construct(
-        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+        bandwidth="100Gbps",
+        delay="0.001ms",
+        error_rate="0",
+        payload=1024,
+        initial_time=0,
+        pfc_priority=1,
+        port=100,
     )
 
 
@@ -72,7 +78,13 @@ def generate_fat_tree(
 ):
 
     network_builder.FatTreeBuilder(link, flow, k, host).construct(
-        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+        bandwidth="100Gbps",
+        delay="0.001ms",
+        error_rate="0",
+        payload=1024,
+        initial_time=0,
+        pfc_priority=1,
+        port=100,
     )
 
 
@@ -83,7 +95,13 @@ def generate_bcube(
 ):
 
     network_builder.BCubeBuilder(link, flow, n).construct(
-        bandwidth="100Gbps", delay="0.001ms", error_rate="0"
+        bandwidth="100Gbps",
+        delay="0.001ms",
+        error_rate="0",
+        payload=1024,
+        initial_time=0,
+        pfc_priority=1,
+        port=100,
     )
 
 

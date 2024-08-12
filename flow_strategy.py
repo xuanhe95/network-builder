@@ -13,62 +13,22 @@ class FlowStrategy(ABC):
         self.output = output
 
     @abstractmethod
-    def next(self, **kwargs):
+    def flow(self, **kwargs):
         pass
+
+    def get_output(self):
+        return self.output
 
 
 class DefaultFlowStrategy(FlowStrategy):
     @log_write
-    def next(self, src, dst, **kwargs):
+    def flow(self, src, dst, **kwargs):
         pfc_priority = kwargs.get("pfc_priority", 0)
         port = kwargs.get("port", 0)
         payload = kwargs.get("payload", 0)
         initial_time = kwargs.get("initial_time", 0)
+        output = f"{src} {dst} {pfc_priority} {port} {payload} {initial_time}\n"
 
-        self.output.write(
-            f"{src} {dst} {pfc_priority} {port} {payload} {initial_time}\n"
-        )
+        self.output.write(output)
 
-        return f"Flow from {src} to {dst} created.\n"
-
-
-class RandomFlowStrategy(FlowStrategy):
-    @log_write
-    def next(self, src, dst, **kwargs):
-
-        pfc_priority = kwargs.get("pfc_priority", 0)
-        port = kwargs.get("port", 0)
-        payload = kwargs.get("payload", 0)
-        initial_time = kwargs.get("initial_time", 0)
-
-        payload = random.randint(0, payload)
-
-        self.output.write(
-            f"{src} {dst} {pfc_priority} {port} {payload} {initial_time}\n"
-        )
-
-        return f"Flow from {src} to {dst} created.\n"
-
-
-class HalfFlowStrategy(FlowStrategy):
-    def __init__(self, output):
-        super().__init__(output)
-        self.id = 0
-
-    @log_write
-    def next(self, src, dst, **kwargs):
-        if self.id % 2 == 0:
-            self.id += 1
-            return f"Flow from {src} to {dst} not created.\n"
-        self.id += 1
-
-        pfc_priority = kwargs.get("pfc_priority", 0)
-        port = kwargs.get("port", 0)
-        payload = kwargs.get("payload", 0)
-        initial_time = kwargs.get("initial_time", 0)
-
-        self.output.write(
-            f"{src} {dst} {pfc_priority} {port} {payload} {initial_time}\n"
-        )
-
-        return f"Flow from {src} to {dst} created.\n"
+        return f"Flow from {src} to {dst} with PFC priority {pfc_priority}, port {port}, payload {payload}, and initial time {initial_time}.\n"

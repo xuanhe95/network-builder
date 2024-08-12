@@ -1,4 +1,4 @@
-from logger import log_write
+from logger import *
 from abc import ABC, abstractmethod
 
 """
@@ -69,7 +69,6 @@ class HalfLinkStrategy(LinkStrategy):
         self.id += 1
 
         output = f"{src} {dst} {bandwidth} {delay} {error_rate}\n"
-
         self.output.write(output)
 
         return f"Connected {src} to {dst} with {bandwidth} bandwidth, {delay} delay, and {error_rate} error rate.\n"

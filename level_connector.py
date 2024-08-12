@@ -25,6 +25,9 @@ class LevelConnector(ABC):
         self.start_id = start_id
         self.kwargs = kwargs
 
+    def __del__(self):
+        self.final_info()
+
     """
     This method is the connection logic for the nodes between two levels.
     It will return the first index of the lower level nodes for the next level connection.
@@ -35,9 +38,9 @@ class LevelConnector(ABC):
         pass
 
     @log_write
-    def finished(self):
+    def final_info(self):
         name = self.__class__.__name__
-        return f"{name} level connected."
+        return f"{name} level connected.\n"
 
     """
     This method is for method chaining.
@@ -140,8 +143,6 @@ class OneOverStepConnector(LevelConnector):
                         **self.kwargs,
                     )
 
-        self.finished()
-
         return lower_level_first_index
 
 
@@ -183,8 +184,6 @@ class OneOverGroupConnector(LevelConnector):
                     lower_node_index,
                     **self.kwargs,
                 )
-
-        self.finished()
 
         return lower_level_first_index
 
@@ -229,8 +228,6 @@ class GroupOverGroupConnector(LevelConnector):
                         **self.kwargs,
                     )
 
-        self.finished()
-
         return lower_level_first_index
 
 
@@ -266,8 +263,6 @@ class FullMeshConnector(LevelConnector):
                     lower_node_index,
                     **self.kwargs,
                 )
-
-        self.finished()
 
         return lower_level_first_index
 
@@ -310,7 +305,5 @@ class GroupOverOneConnector(LevelConnector):
                     lower_node_index,
                     **self.kwargs,
                 )
-
-        self.finished()
 
         return lower_level_first_index

@@ -107,7 +107,7 @@ class SpineLeafBuilder(NetworkBuilder):
 
     def build_flow(self, **kwargs):
         output = self.flow_strategy.get_output()
-        output.write(f"{self.total_nodes * (self.total_nodes - 1)}\n")
+        output.write(f"{len(self.host_set) * (len(self.host_set) - 1)}\n")
 
         for src in self.host_set:
             for dst in self.host_set:
@@ -135,6 +135,7 @@ class FatTreeBuilder(NetworkBuilder):
     ):
         self.output = link_strategy.get_output()
         self.link_strategy = link_strategy
+        self.flow_strategy = flow_strategy
         self.num_core_switches = k**2 // 4
         self.num_agg_switches = k**2 // 2
         self.num_edge_switches = k**2 // 2
@@ -207,7 +208,7 @@ class FatTreeBuilder(NetworkBuilder):
     @log_write
     def build_flow(self, **kwargs):
         output = self.flow_strategy.get_output()
-        output.write(f"{self.total_nodes * (self.total_nodes - 1)}\n")
+        output.write(f"{len(self.host_set) * (len(self.host_set) - 1)}\n")
 
         for src in self.host_set:
             for dst in self.host_set:
@@ -232,6 +233,7 @@ class BCubeBuilder(NetworkBuilder):
     ):
         self.output = link_strategy.get_output()
         self.link_strategy = link_strategy
+        self.flow_strategy = flow_strategy
         self.n = n
         self.kwargs = kwargs
         self.one_level_switches = n
@@ -303,7 +305,7 @@ class BCubeBuilder(NetworkBuilder):
     @log_write
     def build_flow(self, **kwargs):
         output = self.flow_strategy.get_output()
-        output.write(f"{self.total_hosts * (self.total_hosts - 1)}\n")
+        output.write(f"{len(self.host_set) * (len(self.host_set) - 1)}\n")
 
         for src in range(self.total_hosts):
             for dst in range(self.total_hosts):

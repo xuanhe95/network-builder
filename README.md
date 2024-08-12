@@ -3,6 +3,27 @@
 This library provides an abstraction for building various network topologies such as Spine-Leaf, Fat Tree, and BCube using different link strategies. It 
 is primarily used for creating topology and flow files for the NS-3 simulator. However, it can be extended to create and manage any topology format by extending the link strategy and flow strategy components.
 
+# Usage
+
+## Spine-Leaf Topology
+
+
+Run `python3 topogen.py -t spine_leaf` to generate a Spine-Leaf topology.
+By default, it creates two Spine nodes, three Leaf nodes, and each Leaf node connects to two hosts.
+You can adjust these settings using the `--spine`, `--leaf`, and `--host` options.
+
+## Fat Tree Topology 
+
+Run `python3 topogen.py -t fat_tree` to generate a Fat Tree topology.
+By default, it uses k=4, meaning 4 pods with 4 nodes each.
+You can adjust this setting using the `--k` option.
+
+## BCube Topology
+
+Run `python3 topogen.py -t bcube` to generate a Bcube topology.
+By default, it uses n=4, which means there are 4 switches per layer, and each layer connects to 4 hosts.
+
+
 # Components
 
 ## Network Builder

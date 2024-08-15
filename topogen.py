@@ -1,13 +1,11 @@
 import argparse
-from datetime import datetime
 import network_builder
 import link_strategy
 import output_strategy
 import flow_strategy
-
 import os
 import glob
-
+from datetime import datetime
 
 """
 File names

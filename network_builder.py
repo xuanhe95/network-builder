@@ -1,7 +1,13 @@
 from abc import ABC, abstractmethod
-from output_strategy import FileOutputStrategy
-from link_strategy import *
-from level_connector import *
+from logger import log_write
+from level_connector import (
+    LevelConnector,
+    FullMeshConnector,
+    OneOverGroupConnector,
+    OneOverStepConnector,
+    GroupOverGroupConnector,
+    GroupOverOneConnector,
+)
 
 """
 NetworkBuilder is an abstract class that defines the methods that will be used to build the topology.

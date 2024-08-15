@@ -1,5 +1,5 @@
-from logger import *
 from abc import ABC, abstractmethod
+from logger import log_write
 
 """
 LinkStrategy is the abstraction for creating links between two nodes.

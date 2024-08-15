@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
+from logger import log_write
 
-from link_strategy import *
 
 """
 LevelConnector is the abstraction for connecting nodes in different levels of the topology.
